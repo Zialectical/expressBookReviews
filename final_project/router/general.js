@@ -70,4 +70,28 @@ public_users.get('/title/:title', function (req, res) {
     const booksByTitle = [];
 
     for (let isbn in books) {
-        if (books[isbn].title ===​⬤
+        if (books[isbn].title === title) {
+            booksByTitle.push({ isbn, ...books[isbn] });
+        }
+    }
+
+    if (booksByTitle.length > 0) {
+        return res.status(200).json(booksByTitle);
+    } else {
+        return res.status(404).json({ message: "No books found with this title" });
+    }
+});
+
+// Get book review
+public_users.get('/review/:isbn', function (req, res) {
+    const isbn = req.params.isbn;
+    const book = books[isbn];
+
+    if (book) {
+        return res.status(200).json(book.reviews);
+    } else {
+        return res.status(404).json({ message: "Book not found" });
+    }
+});
+
+module.exports.general = public_users;
