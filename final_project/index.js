@@ -11,22 +11,28 @@ app.use(express.json());
 app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUninitialized: true}))
 
 app.use("/customer/auth/*", function auth(req,res,next){
+	// I added the below - update as neeeded
     // Assuming the token is sent in the Authorization header as "Bearer <token>"
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Extract the token from the header
+	if (req.session.authorization) {
+        let token = req.session.authorization['accessToken'];
 
-    if (token == null) return res.sendStatus(401); // If no token, return 401 Unauthorized
-
-    jwt.verify(token, "aVeryVerySecretString", (err, user) => {
-        if (err) return res.sendStatus(403); // If token is not valid, return 403 Forbidden
-        req.user = user; // If valid, attach user payload to request object
-        next(); // Proceed to the next middleware or route handler
-    });
+		// Verify JWT token
+        jwt.verify(token, "access", (err, user) => {
+            if (!err) {
+                req.user = user;
+                next(); // Proceed to the next middleware
+            } else {
+                return res.status(403).json({ message: "User not authenticated" });
+            }
+        });
+    } else {
+        return res.status(403).json({ message: "User not logged in" });
+    }
 });
  
-const PORT =5000;
+const PORT =5001;
 
 app.use("/customer", customer_routes);
 app.use("/", genl_routes);
 
-app.listen(PORT,()=>console.log("Server is running"));
+app.listen(PORT,()=>console.log("Server is running on port 5001"));
