@@ -44,7 +44,7 @@ public_users.get('/isbn/:isbn', function (req, res) {
     } else {
         return res.status(404).json({ message: "Book not found" }); // Respond with an error if not found
     }
-}); // Lines 38-46 were added to implement getting book details based on ISBN
+});
 
 // Get book details based on author
 public_users.get('/author/:author', function (req, res) {
