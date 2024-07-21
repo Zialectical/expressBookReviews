@@ -48,19 +48,20 @@ public_users.get('/isbn/:isbn', function (req, res) {
 
 // Get book details based on author
 public_users.get('/author/:author', function (req, res) {
-    const author = req.params.author;
-    const booksByAuthor = [];
+    const author = req.params.author; // Retrieve the author from the request parameters
+    const booksByAuthor = []; // Array to hold books by the specified author
 
+    // Iterate through all books to find matches by author
     for (let isbn in books) {
         if (books[isbn].author === author) {
-            booksByAuthor.push({ isbn, ...books[isbn] });
+            booksByAuthor.push({ isbn, ...books[isbn] }); // Add matching book to the array
         }
     }
 
     if (booksByAuthor.length > 0) {
-        return res.status(200).json(booksByAuthor);
+        return res.status(200).json(booksByAuthor); // Respond with the list of books by the author
     } else {
-        return res.status(404).json({ message: "No books found by this author" });
+        return res.status(404).json({ message: "No books found by this author" }); // Respond with an error if no books found
     }
 });
 
