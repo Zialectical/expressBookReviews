@@ -1,6 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const session = require('express-session'); 
+const session = require('express-session');
 
 let books = require("./booksdb.js");
 
@@ -15,11 +15,7 @@ const doesExist = (username) => {
       return user.username === username;
   });
   // Return true if any user with the same username is found, otherwise false
-  if (userswithsamename.length > 0) {
-      return true;
-  } else {
-      return false;
-  }
+  return userswithsamename.length > 0;
 }
 
 // Check if the user with the given username and password exists
@@ -29,29 +25,45 @@ const authenticatedUser = (username, password) => {
       return (user.username === username && user.password === password);
   });
   // Return true if any valid user is found, otherwise false
-  if (validusers.length > 0) {
-      return true;
-  } else {
-      return false;
+  return validusers.length > 0;
+}
+
+// Only registered users can login
+regd_users.post("/login", (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+
+  if (!username || !password) {
+      return res.status(400).json({ message: "Username and password are required" });
   }
-}
 
-const authenticatedUser = (username,password)=>{ //returns boolean
-//write code to check if username and password match the one we have in records.
-}
-
-//only registered users can login
-regd_users.post("/login", (req,res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  if (authenticatedUser(username, password)) {
+      let accessToken = jwt.sign({ data: username }, 'access', { expiresIn: 60 * 60 });
+      
+      req.session.authorization = {
+          accessToken
+      };
+      return res.status(200).json({ message: "User successfully logged in", token: accessToken });
+  } else {
+      return res.status(401).json({ message: "Invalid username or password" });
+  }
 });
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const isbn = req.params.isbn;
+  const review = req.body.review;
+  const username = req.user.data;
+
+  if (!books[isbn]) {
+      return res.status(404).json({ message: "Book not found" });
+  }
+
+  // Add review to the book
+  books[isbn].reviews[username] = review;
+  return res.status(200).json({ message: "Review added successfully", reviews: books[isbn].reviews });
 });
 
 module.exports.authenticated = regd_users;
-module.exports.isValid = isValid;
+module.exports.isValid = doesExist;
 module.exports.users = users;
