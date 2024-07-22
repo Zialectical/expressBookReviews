@@ -32,7 +32,6 @@ public_users.post("/register", async (req, res) => {
 // Get the book list available in the shop
 public_users.get('/', async (req, res) => {
     try {
-        // Simulate an asynchronous operation using Axios
         const response = await axios.get('http://localhost:5001/books'); // Mock endpoint
         return res.status(200).json(response.data);
     } catch (error) {
@@ -40,7 +39,7 @@ public_users.get('/', async (req, res) => {
     }
 });
 
-// Mock endpoint for getting books to simulate async operation (you can remove this in production)
+// Mock endpoint for getting books to simulate async operation 
 public_users.get('/books', (req, res) => {
     return res.status(200).json(books);
 });
@@ -49,7 +48,6 @@ public_users.get('/books', (req, res) => {
 public_users.get('/isbn/:isbn', async (req, res) => {
     const isbn = req.params.isbn;
     try {
-        // Simulate an asynchronous operation using Axios
         const response = await axios.get(`http://localhost:5001/books/${isbn}`); // Mock endpoint
         if (response.data) {
             return res.status(200).json(response.data);
@@ -61,7 +59,7 @@ public_users.get('/isbn/:isbn', async (req, res) => {
     }
 });
 
-// Mock endpoint for getting book details by ISBN to simulate async operation (you can remove this in production)
+// Mock endpoint for getting book details by ISBN to simulate async operation 
 public_users.get('/books/:isbn', (req, res) => {
     const isbn = req.params.isbn;
     const book = books[isbn];
@@ -69,6 +67,58 @@ public_users.get('/books/:isbn', (req, res) => {
         return res.status(200).json(book);
     } else {
         return res.status(404).json({ message: "Book not found" });
+    }
+});
+
+// Get book details based on Author
+public_users.get('/author/:author', async (req, res) => {
+    const author = req.params.author;
+    try {
+        const response = await axios.get(`http://localhost:5001/books/author/${author}`); // Mock endpoint
+        if (response.data.length > 0) {
+            return res.status(200).json(response.data);
+        } else {
+            return res.status(404).json({ message: "Books by this author not found" });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: "Error fetching book details", error: error.message });
+    }
+});
+
+// Mock endpoint for getting book details by Author to simulate async operation 
+public_users.get('/books/author/:author', (req, res) => {
+    const author = req.params.author;
+    const booksByAuthor = Object.values(books).filter(book => book.author === author);
+    if (booksByAuthor.length > 0) {
+        return res.status(200).json(booksByAuthor);
+    } else {
+        return res.status(404).json({ message: "Books by this author not found" });
+    }
+});
+
+// Get book details based on Title
+public_users.get('/title/:title', async (req, res) => {
+    const title = req.params.title;
+    try {
+        const response = await axios.get(`http://localhost:5001/books/title/${title}`); // Mock endpoint
+        if (response.data.length > 0) {
+            return res.status(200).json(response.data);
+        } else {
+            return res.status(404).json({ message: "Books with this title not found" });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: "Error fetching book details", error: error.message });
+    }
+});
+
+// Mock endpoint for getting book details by Title to simulate async operation 
+public_users.get('/books/title/:title', (req, res) => {
+    const title = req.params.title;
+    const booksByTitle = Object.values(books).filter(book => book.title === title);
+    if (booksByTitle.length > 0) {
+        return res.status(200).json(booksByTitle);
+    } else {
+        return res.status(404).json({ message: "Books with this title not found" });
     }
 });
 
