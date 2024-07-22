@@ -11,14 +11,13 @@ app.use(express.json());
 
 // Set up session middleware
 app.use("/customer", session({
-    secret: "fingerprint_customer", // Secret for session
-    resave: true, // Resave session even if not modified
-    saveUninitialized: true // Save uninitialized session
+    secret: "fingerprint_customer",
+    resave: true,
+    saveUninitialized: true
 }));
 
 // Authentication middleware for /customer/auth/* routes
 app.use("/customer/auth/*", function auth(req, res, next) {
-    // Check if authorization is set in session
     if (req.session.authorization) {
         let token = req.session.authorization['accessToken'];
 

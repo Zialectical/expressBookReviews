@@ -10,89 +10,25 @@ function doesExist(username) {
 }
 
 // Register a new user
-public_users.post("/register", (req, res) => {
+public_users.post("/register", express.json(), (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
     // Check if both username and password are provided
-    if (username && password) {
-        // Check if the user does not already exist
-        if (!doesExist(username)) {
-            // Add the new user to the users array
-            users.push({ "username": username, "password": password });
-            return res.status(200).json({ message: "User successfully registered. Now you can login" });
-        } else {
-            return res.status(404).json({ message: "User already exists!" });
-        }
+    if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
     }
-    // Return error if username or password is missing
-    return res.status(404).json({ message: "Unable to register user." });
+
+    // Check if the user already exists
+    if (doesExist(username)) {
+        return res.status(400).json({ message: "User already exists!" });
+    }
+
+    // Add the new user to the users array
+    users.push({ "username": username, "password": password });
+    return res.status(201).json({ message: "User successfully registered. Now you can login" });
 });
 
-// Get the book list available in the shop
-public_users.get('/', function (req, res) {
-    return res.status(200).json(books); // Respond with the books object directly
-});
-
-// Get book details based on ISBN
-public_users.get('/isbn/:isbn', function (req, res) {
-    const isbn = req.params.isbn; // Retrieve the ISBN from the request parameters
-    const book = books[isbn]; // Find the book by ISBN
-
-    if (book) {
-        return res.status(200).json(book); // Respond with the book details if found
-    } else {
-        return res.status(404).json({ message: "Book not found" }); // Respond with an error if not found
-    }
-});
-
-// Get book details based on author
-public_users.get('/author/:author', function (req, res) {
-    const author = req.params.author; // Retrieve the author from the request parameters
-    const booksByAuthor = []; // Array to hold books by the specified author
-
-    // Iterate through all books to find matches by author
-    for (let isbn in books) {
-        if (books[isbn].author === author) {
-            booksByAuthor.push({ isbn, ...books[isbn] }); // Add matching book to the array
-        }
-    }
-
-    if (booksByAuthor.length > 0) {
-        return res.status(200).json(booksByAuthor); // Respond with the list of books by the author
-    } else {
-        return res.status(404).json({ message: "No books found by this author" }); // Respond with an error if no books found
-    }
-});
-
-// Get all books based on title
-public_users.get('/title/:title', function (req, res) {
-    const title = req.params.title;
-    const booksByTitle = [];
-
-    for (let isbn in books) {
-        if (books[isbn].title === title) {
-            booksByTitle.push({ isbn, ...books[isbn] });
-        }
-    }
-
-    if (booksByTitle.length > 0) {
-        return res.status(200).json(booksByTitle);
-    } else {
-        return res.status(404).json({ message: "No books found with this title" });
-    }
-});
-
-// Get book review
-public_users.get('/review/:isbn', function (req, res) {
-    const isbn = req.params.isbn;
-    const book = books[isbn];
-
-    if (book) {
-        return res.status(200).json(book.reviews);
-    } else {
-        return res.status(404).json({ message: "Book not found" });
-    }
-});
+// Other routes ...
 
 module.exports.general = public_users;
