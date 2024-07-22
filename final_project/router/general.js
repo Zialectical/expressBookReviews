@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios');
 let books = require("./booksdb.js");
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
@@ -9,7 +10,7 @@ function doesExist(username) {
 }
 
 // Register a new user
-public_users.post("/register", (req, res) => {
+public_users.post("/register", async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
@@ -29,8 +30,19 @@ public_users.post("/register", (req, res) => {
 });
 
 // Get the book list available in the shop
-public_users.get('/', function (req, res) {
-    return res.status(200).json(books); // Respond with the books object directly
+public_users.get('/', async (req, res) => {
+    try {
+        // Simulate an asynchronous operation using Axios
+        const response = await axios.get('http://localhost:5001/books'); 
+        return res.status(200).json(response.data);
+    } catch (error) {
+        return res.status(500).json({ message: "Error fetching books", error: error.message });
+    }
+});
+
+// Mock endpoint for getting books to simulate async operation. 
+public_users.get('/books', (req, res) => {
+    return res.status(200).json(books);
 });
 
 module.exports.general = public_users;
