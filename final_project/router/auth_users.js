@@ -42,11 +42,15 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   const review = req.query.review;
   const username = req.user.data;
 
+  console.log(`Attempting to add/modify review for ISBN: ${isbn} by user: ${username}`);
+
   if (!books[isbn]) {
+    console.log(`Book with ISBN: ${isbn} not found`);
     return res.status(404).json({ message: "Book not found" });
   }
 
   books[isbn].reviews[username] = review;
+  console.log(`Review added/modified successfully for ISBN: ${isbn} by user: ${username}`);
   return res.status(200).json({ message: "Review added/modified successfully", reviews: books[isbn].reviews });
 });
 
@@ -55,14 +59,19 @@ regd_users.delete("/auth/review/:isbn", (req, res) => {
   const isbn = req.params.isbn;
   const username = req.user.data;
 
+  console.log(`Attempting to delete review for ISBN: ${isbn} by user: ${username}`);
+
   if (!books[isbn]) {
+    console.log(`Book with ISBN: ${isbn} not found`);
     return res.status(404).json({ message: "Book not found" });
   }
 
   if (books[isbn].reviews[username]) {
     delete books[isbn].reviews[username];
+    console.log(`Review deleted successfully for ISBN: ${isbn} by user: ${username}`);
     return res.status(200).json({ message: "Review deleted successfully", reviews: books[isbn].reviews });
   } else {
+    console.log(`Review not found for ISBN: ${isbn} by user: ${username}`);
     return res.status(404).json({ message: "Review not found" });
   }
 });
