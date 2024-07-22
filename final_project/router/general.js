@@ -1,6 +1,5 @@
 const express = require('express');
 let books = require("./booksdb.js");
-let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
@@ -10,7 +9,7 @@ function doesExist(username) {
 }
 
 // Register a new user
-public_users.post("/register", express.json(), (req, res) => {
+public_users.post("/register", (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
@@ -29,6 +28,9 @@ public_users.post("/register", express.json(), (req, res) => {
     return res.status(201).json({ message: "User successfully registered. Now you can login" });
 });
 
-// Other routes ...
+// Get the book list available in the shop
+public_users.get('/', function (req, res) {
+    return res.status(200).json(books); // Respond with the books object directly
+});
 
 module.exports.general = public_users;
